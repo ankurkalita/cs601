@@ -82,6 +82,10 @@ void singly_linked_list::insert_at_any_random_location(struct node** list, int v
 //  d.Delete beginning node 
 void singly_linked_list::delete_beginning_node(struct node** list){
     if(*list!=NULL){
+        if((*list)->next == NULL){
+            *list = NULL;
+            return;
+        }
         struct node* head = *list;
         *list = (*list)->next;
         delete head;
