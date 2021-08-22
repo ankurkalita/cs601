@@ -1,14 +1,15 @@
-#include "./singly_linked_list_node.h"
+#include "./doubly_linked_list_node.h"
 #include <iostream>
 
 //  Create a linked list with value 0 or provided value
-void singly_linked_list::create(struct node** list, int value = 0){
+void doubly_linked_list::create(struct node** list, int value = 0){
     if(*list == NULL){
         *list = new node;
 
         if(*list != NULL){
             (*list)->data = value;
             (*list)->next = NULL; 
+            (*list)->prev = NULL;
             std::cout << "Created a Linked list with first node data " << value << std::endl;
         } else {
             std::cout << "Error Creating Linked List";
@@ -17,20 +18,24 @@ void singly_linked_list::create(struct node** list, int value = 0){
 }
 
 //  a. Insert a node at the beginning 
-void singly_linked_list::insert_at_the_beginning(struct node** list, int value){
+void doubly_linked_list::insert_at_the_beginning(struct node** list, int value){
     //  Create a new node
     struct node* temp = new node;
 
     //  Assign the head node address to the next of the temp node, also assign the data as the value provided
     temp->data = value;
     temp->next = *list;
+    temp->prev = NULL;
+
+    //  Assign the current head node prev to the new head
+    (*list)->prev = temp;
 
     //  Change the head of the node to the new created node
     *list = temp;
 }
 
 //  b.Insert a node at the end
-void singly_linked_list::insert_at_the_end(struct node** list, int value){
+void doubly_linked_list::insert_at_the_end(struct node** list, int value){
     //  Create a new node
     struct node* temp = new node;
     //  Assign the temp node next as NULL, also assign the data as the value provided
@@ -46,41 +51,11 @@ void singly_linked_list::insert_at_the_end(struct node** list, int value){
     }
 
     last->next = temp;
+    temp->prev = last;
 }
 
-//  c.Insert a node at any random location
-void singly_linked_list::insert_at_any_random_location(struct node** list, int value, int location){
-    //  Create a new node
-    struct node* temp = new node;
-    int count = 0;
-
-    struct node* needed_node = *list;
-
-    //Iterate till we reach the end of the Linked list or the provided location
-    while(needed_node->next != NULL){
-        count++;
-        
-        if(count == location){
-            break;
-        }
-
-        needed_node = needed_node->next;
-    }
-
-    if(count != location){
-        std::cout << "\nLocation exceeds linked list size";
-        return;
-    }
-
-    //  Assign the node next address to the next of the temp node, also assign the data as the value provided
-    temp->data = value;
-    temp->next = needed_node->next;
-    
-    needed_node->next = temp;
-}
-
-//  d.Delete beginning node 
-void singly_linked_list::delete_beginning_node(struct node** list){
+//  c.Delete beginning node 
+void doubly_linked_list::delete_beginning_node(struct node** list){
     if(*list!=NULL){
         if((*list)->next == NULL){
             *list = NULL;
@@ -88,12 +63,13 @@ void singly_linked_list::delete_beginning_node(struct node** list){
         }
         struct node* head = *list;
         *list = (*list)->next;
+        (*list)->prev = NULL;
         delete head;
     }
 }
 
-//  e.Delete last node 
-void singly_linked_list::delete_last_node(struct node** list){
+//  d.Delete last node 
+void doubly_linked_list::delete_last_node(struct node** list){
     if(*list!=NULL){
         if((*list)->next == NULL){
             *list = NULL;
@@ -111,18 +87,16 @@ void singly_linked_list::delete_last_node(struct node** list){
     }
 }
 
-//  f.Delete a node at any random location
-void singly_linked_list::delete_at_any_random_location(struct node** list, int location){
+//  e.Delete a node at any random location(In between nodes)
+void doubly_linked_list::delete_at_any_random_location(struct node** list, int location){
     int count = 0;
 
     struct node* needed_node = *list;
-    struct node* prev_node = needed_node;
 
     if(location == 0){
         delete_beginning_node(list);
         return;
     }
-
     //Iterate till we reach the end of the Linked list or the provided location
     while(needed_node->next != NULL){
         
@@ -131,7 +105,6 @@ void singly_linked_list::delete_at_any_random_location(struct node** list, int l
         }
 
         count++;
-        prev_node = needed_node;
         needed_node = needed_node->next;
     }
 
@@ -139,37 +112,13 @@ void singly_linked_list::delete_at_any_random_location(struct node** list, int l
         std::cout << "\nLocation exceeds linked list size";
         return;
     }
+    struct node* previous_node = needed_node->prev;
 
-    //  Assign the node next address to the next of the previous node
-    prev_node->next = needed_node->next;
+    previous_node->next = needed_node->next;
     delete needed_node;    
 }
 
-//  g.Search for an element
-void singly_linked_list::search_for_an_element(struct node** list, int element){
-    int count = 0;
-    bool found = false;
-    struct node* temp = *list;
-
-    //Iterate till we reach the end of the Linked list or the provided location
-    while(temp->next != NULL){
-        if(temp->data == element){
-            found = true;
-            break;
-        }
-        temp = temp->next;
-        count++;
-    }
-
-    if(!found){
-        std::cout << "\nNot Found";
-        return;
-    } else {
-        std::cout << "\nFound at " << count;
-    }   
-}
-
-void singly_linked_list::display(struct node** list){
+void doubly_linked_list::display(struct node** list){
     struct node* temp = *list;
     while(temp != NULL){
         std::cout << temp->data << " ";
